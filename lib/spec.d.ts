@@ -24,13 +24,16 @@ export interface Route {
 export declare type Schema = {
     [key: string]: any;
 };
-interface Tag {
+export interface Tag {
     name: string;
     description: string;
 }
-interface Server {
+export interface Server {
     url: string;
     description: string;
+}
+export interface Response {
+    [code: number]: Object;
 }
 export interface SchemaBaseInfo {
     title?: string;
@@ -43,6 +46,11 @@ export interface SchemaBaseInfo {
     tags?: Array<Tag>;
     servers: Array<Server>;
 }
+export declare const parametersSections: {
+    headers: string;
+    params: string;
+    querystring: string;
+};
 export declare function omitFromSchema(schema: Schema, ...properties: Array<string>): Schema;
 export declare class Spec implements SchemaBaseInfo {
     title?: string;
@@ -76,4 +84,3 @@ export declare class Spec implements SchemaBaseInfo {
     private resolveReference;
     private generateSchemaObjects;
 }
-export {};

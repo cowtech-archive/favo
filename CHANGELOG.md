@@ -1,3 +1,7 @@
+### 2018-11-19 / 0.2.0
+
+* feat: Added folder route generation.
+
 ### 2018-11-17 / 0.1.1
 
 * chore: Removed unused dependency.

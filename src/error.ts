@@ -1,5 +1,6 @@
 import { ErrorObject } from 'ajv'
 import Boom, { badRequest, internal } from 'boom'
+import capitalize from 'lodash.capitalize'
 import { Schema } from './spec'
 import { convertValidationErrors, validationMessages } from './validation'
 
@@ -32,18 +33,18 @@ export function serializeErrorStack(error: Error): Array<string> {
   )
 }
 
-export function convertError(data: Schema, error: ExtendedError): Boom {
-  const stack = serializeErrorStack(error)
+export function convertError(data: Schema, e: ExtendedError): Boom {
+  const stack = serializeErrorStack(e)
   stack.shift()
 
-  if (error.validation) {
-    const prefix = error.message.split(/[\.\s\[]/).shift()
-    return convertValidationErrors(data, error.validation, prefix!)
-  } else if (error.code === 'INVALID_CONTENT_TYPE') return badRequest(validationMessages.contentType)
-  else if (error.code === 'MALFORMED_JSON' || (stack[0] || '').startsWith('JSON.parse')) {
-    return badRequest(validationMessages.json)
+  if (e.validation) {
+    const prefix = e.message.split(/[\.\s\[]/).shift()
+    return convertValidationErrors(data, e.validation, prefix!)
+  } else if (e.code === 'INVALID_CONTENT_TYPE') return badRequest(capitalize(validationMessages.contentType))
+  else if (e.code === 'MALFORMED_JSON' || e.message === 'Invalid JSON' || (stack[0] || '').startsWith('JSON.parse')) {
+    return badRequest(capitalize(validationMessages.json))
   }
 
   // Message must be passed as data otherwise Boom will hide it
-  return internal('', { message: serializeErrorDescription(error), stack })
+  return internal('', { message: serializeErrorDescription(e), stack })
 }

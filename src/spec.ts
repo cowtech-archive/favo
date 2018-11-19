@@ -1,3 +1,4 @@
+import { sync as glob } from 'glob'
 import * as http from 'http'
 import get from 'lodash.get'
 import omit from 'lodash.omit'
@@ -28,7 +29,7 @@ export interface Route {
     }
   }
   config?: any
-  handler: ExpressMiddleware | RequestHandler
+  handler?: ExpressMiddleware | RequestHandler
 }
 
 export type Schema = { [key: string]: any }
@@ -57,6 +58,7 @@ export interface SchemaBaseInfo {
   version?: string
   tags?: Array<Tag>
   servers: Array<Server>
+  folder?: string
 }
 
 export const parametersSections = {
@@ -104,7 +106,7 @@ export class Spec implements SchemaBaseInfo {
   paths: Schema
 
   constructor(
-    { title, description, authorName, authorUrl, authorEmail, license, version, servers, tags }: SchemaBaseInfo,
+    { title, description, authorName, authorUrl, authorEmail, license, version, servers, tags, folder }: SchemaBaseInfo,
     skipDefaultErrors: boolean = false
   ) {
     if (!license) license = 'MIT'
@@ -122,6 +124,8 @@ export class Spec implements SchemaBaseInfo {
       accu[e.properties.statusCode.enum[0]] = omit(e, 'ref')
       return accu
     }, {})
+
+    if (folder) this.addFolder(folder)
   }
 
   generate(): Schema {
@@ -184,7 +188,9 @@ export class Spec implements SchemaBaseInfo {
     Object.assign(this.securitySchemes, schemes)
   }
 
-  addRoutes(routes: Array<Route>): void {
+  addRoutes(routes: Route | Array<Route>): void {
+    if (!Array.isArray(routes)) routes = [routes]
+
     // Filter only routes who have API schema defined and not hidden
     const apiRoutes = routes
       .filter(r => {
@@ -218,6 +224,25 @@ export class Spec implements SchemaBaseInfo {
 
       if (requestBody && method !== 'get' && method !== 'delete') {
         this.paths[path][(route.method as string).toLowerCase()].requestBody = requestBody
+      }
+    }
+  }
+
+  addFolder(folder: string): void {
+    for (const file of glob(`${folder}/**/*(*.ts|*.js)`)) {
+      const required = require(file)
+      const routes: Array<Route | undefined> = required.routes || [required.route]
+
+      for (const route of routes) {
+        if (route) {
+          this.addRoutes(route)
+
+          const models = get(route, 'meta.config.models')
+          const securitySchemes = get(route, 'meta.config.securitySchemes')
+
+          if (models) this.addModels(models)
+          if (securitySchemes) this.addSecuritySchemes(securitySchemes)
+        }
       }
     }
   }

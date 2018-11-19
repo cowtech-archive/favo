@@ -13,7 +13,7 @@ export const validationMessagesFormatter: { [key: string]: validationFormatter }
     `must be one of the following values: ${niceJoin(values.map(f => `"${f}"`), ' or ')}`,
   invalidResponseCode: (code: number) => `This endpoint cannot respond with HTTP status ${code}.`,
   invalidResponse: (code: number) =>
-    `The response returned from the endpoint violates its specification for the HTTP status ${code}`
+    `The response returned from the endpoint violates its specification for the HTTP status ${code}.`
 }
 
 export const validationMessages: { [key: string]: string } = {

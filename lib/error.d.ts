@@ -9,4 +9,4 @@ export declare class ExtendedError extends Error {
 }
 export declare function serializeErrorDescription(error: ExtendedError): string;
 export declare function serializeErrorStack(error: Error): Array<string>;
-export declare function convertError(data: Schema, error: ExtendedError): Boom;
+export declare function convertError(data: Schema, e: ExtendedError): Boom;

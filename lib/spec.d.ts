@@ -19,7 +19,7 @@ export interface Route {
         };
     };
     config?: any;
-    handler: ExpressMiddleware | RequestHandler;
+    handler?: ExpressMiddleware | RequestHandler;
 }
 export declare type Schema = {
     [key: string]: any;
@@ -45,6 +45,7 @@ export interface SchemaBaseInfo {
     version?: string;
     tags?: Array<Tag>;
     servers: Array<Server>;
+    folder?: string;
 }
 export declare const parametersSections: {
     headers: string;
@@ -68,7 +69,7 @@ export declare class Spec implements SchemaBaseInfo {
     responses: Schema;
     errors: Schema;
     paths: Schema;
-    constructor({ title, description, authorName, authorUrl, authorEmail, license, version, servers, tags }: SchemaBaseInfo, skipDefaultErrors?: boolean);
+    constructor({ title, description, authorName, authorUrl, authorEmail, license, version, servers, tags, folder }: SchemaBaseInfo, skipDefaultErrors?: boolean);
     generate(): Schema;
     addModels(models: {
         [key: string]: Schema;
@@ -76,7 +77,8 @@ export declare class Spec implements SchemaBaseInfo {
     addSecuritySchemes(schemes: {
         [key: string]: SecurityScheme;
     }): void;
-    addRoutes(routes: Array<Route>): void;
+    addRoutes(routes: Route | Array<Route>): void;
+    addFolder(folder: string): void;
     private parseSecurity;
     private parseParameters;
     private parsePayload;

@@ -1,3 +1,7 @@
+### 2018-11-21 / 0.3.0
+
+* feat: Added models and securitySchemes to Spec constructor.
+
 ### 2018-11-19 / 0.2.0
 
 * feat: Added folder route generation.

@@ -59,8 +59,6 @@ export interface SchemaBaseInfo {
   tags?: Array<Tag>
   servers: Array<Server>
   folder?: string
-  securitySchemes: Schema
-  models: Schema
 }
 
 export const parametersSections = {

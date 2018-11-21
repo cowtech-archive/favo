@@ -59,6 +59,8 @@ export interface SchemaBaseInfo {
   tags?: Array<Tag>
   servers: Array<Server>
   folder?: string
+  securitySchemes: Schema
+  models: Schema
 }
 
 export const parametersSections = {
@@ -106,7 +108,20 @@ export class Spec implements SchemaBaseInfo {
   paths: Schema
 
   constructor(
-    { title, description, authorName, authorUrl, authorEmail, license, version, servers, tags, folder }: SchemaBaseInfo,
+    {
+      title,
+      description,
+      authorName,
+      authorUrl,
+      authorEmail,
+      license,
+      version,
+      servers,
+      tags,
+      models,
+      securitySchemes,
+      folder
+    }: SchemaBaseInfo,
     skipDefaultErrors: boolean = false
   ) {
     if (!license) license = 'MIT'
@@ -125,6 +140,8 @@ export class Spec implements SchemaBaseInfo {
       return accu
     }, {})
 
+    if (models) this.addModels(models)
+    if (securitySchemes) this.addSecuritySchemes(securitySchemes)
     if (folder) this.addFolder(folder)
   }
 

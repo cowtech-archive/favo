@@ -46,6 +46,8 @@ export interface SchemaBaseInfo {
     tags?: Array<Tag>;
     servers: Array<Server>;
     folder?: string;
+    securitySchemes: Schema;
+    models: Schema;
 }
 export declare const parametersSections: {
     headers: string;
@@ -69,7 +71,7 @@ export declare class Spec implements SchemaBaseInfo {
     responses: Schema;
     errors: Schema;
     paths: Schema;
-    constructor({ title, description, authorName, authorUrl, authorEmail, license, version, servers, tags, folder }: SchemaBaseInfo, skipDefaultErrors?: boolean);
+    constructor({ title, description, authorName, authorUrl, authorEmail, license, version, servers, tags, models, securitySchemes, folder }: SchemaBaseInfo, skipDefaultErrors?: boolean);
     generate(): Schema;
     addModels(models: {
         [key: string]: Schema;

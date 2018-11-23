@@ -237,8 +237,8 @@ export class Spec implements SchemaBaseInfo {
         if (route) {
           this.addRoutes(route)
 
-          const models = get(route, 'meta.config.models')
-          const securitySchemes = get(route, 'meta.config.securitySchemes')
+          const models = get(route, 'config.models')
+          const securitySchemes = get(route, 'config.securitySchemes')
 
           if (models) this.addModels(models)
           if (securitySchemes) this.addSecuritySchemes(securitySchemes)

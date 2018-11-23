@@ -6,7 +6,7 @@ import { niceJoin } from './utils'
 
 export type validationFormatter = (...args: Array<any>) => string
 
-export const validationMessagesFormatter: { [key: string]: validationFormatter } = {
+export const validationMessagesFormatters: { [key: string]: validationFormatter } = {
   minimum: (min: number) => `must be a number greater than or equal to ${min}`,
   maximum: (max: number) => `must be a number less than or equal to ${max}`,
   enum: (values: Array<string>) =>
@@ -76,16 +76,16 @@ export function convertValidationErrors(
         message = validationMessages[(e.params as Ajv.TypeParams).type]
         break
       case 'minimum':
-        message = validationMessagesFormatter.minimum((e.params as Ajv.ComparisonParams).limit as number)
+        message = validationMessagesFormatters.minimum((e.params as Ajv.ComparisonParams).limit as number)
         break
       case 'maximum':
-        message = validationMessagesFormatter.maximum((e.params as Ajv.ComparisonParams).limit as number)
+        message = validationMessagesFormatters.maximum((e.params as Ajv.ComparisonParams).limit as number)
         break
       case 'number':
         message = validationMessages.number
         break
       case 'enum':
-        message = validationMessagesFormatter.enum((e.params as Ajv.EnumParams).allowedValues)
+        message = validationMessagesFormatters.enum((e.params as Ajv.EnumParams).allowedValues)
         break
       case 'pattern':
         const pattern = (e.params as Ajv.PatternParams).pattern
@@ -94,7 +94,7 @@ export function convertValidationErrors(
           message = validationMessages.presentString
         } else if (key === 'fields') {
           const name = pattern.match(/^\^\(\?\<([a-zA-Z]+)\>.+/)![1]
-          message = validationMessagesFormatter.fields(name)
+          message = validationMessagesFormatters.fields(name)
         } else {
           message = e.message!.replace(/\(\?\:/g, '(')
         }
@@ -107,7 +107,9 @@ export function convertValidationErrors(
         if (reason === 'ipv4' || reason === 'ipv6') reason = 'ip'
         else if (reason === 'date-time') reason = 'timestamp'
 
-        message = validationMessages[reason]
+        message = validationMessagesFormatters[reason]
+          ? validationMessagesFormatters[reason](reason)
+          : validationMessages[reason]
 
         break
     }

@@ -2,7 +2,7 @@ import Ajv from 'ajv';
 import Boom from 'boom';
 import { Schema } from './spec';
 export declare type validationFormatter = (...args: Array<any>) => string;
-export declare const validationMessagesFormatter: {
+export declare const validationMessagesFormatters: {
     [key: string]: validationFormatter;
 };
 export declare const validationMessages: {

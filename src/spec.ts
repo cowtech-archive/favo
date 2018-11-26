@@ -235,13 +235,20 @@ export class Spec implements SchemaBaseInfo {
 
       for (const route of routes) {
         if (route) {
-          this.addRoutes(route)
-
           const models = get(route, 'config.models')
           const securitySchemes = get(route, 'config.securitySchemes')
 
           if (models) this.addModels(models)
-          if (securitySchemes) this.addSecuritySchemes(securitySchemes)
+          if (securitySchemes) {
+            if (!route.config.security) route.config.security = []
+            else if (typeof route.config.security === 'string') route.config.security = [route.config.security]
+
+            for (const scheme of Object.keys(securitySchemes)) route.config.security.push(scheme)
+
+            this.addSecuritySchemes(securitySchemes)
+          }
+
+          this.addRoutes(route)
         }
       }
     }

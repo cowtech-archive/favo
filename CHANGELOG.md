@@ -1,3 +1,7 @@
+### 2018-11-26 / 0.5.1
+
+* fix: Autocompile security from securitySchemes.
+
 ### 2018-11-23 / 0.5.0
 
 * feat: Export validation messages.

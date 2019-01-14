@@ -1,3 +1,5 @@
+export type SecuritySchemeDefinition = string | object
+
 export interface SecurityScheme {
   type: 'http' | 'apiKey' | 'oauth2' | 'openIdConnect'
   description?: string

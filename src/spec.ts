@@ -2,7 +2,7 @@ import { sync as glob } from 'glob'
 import * as http from 'http'
 import get from 'lodash.get'
 import omit from 'lodash.omit'
-import { SecurityScheme } from './authentication'
+import { SecurityScheme, SecuritySchemeDefinition } from './authentication'
 import { errors } from './errors'
 
 export type ExpressMiddleware = (
@@ -61,7 +61,7 @@ export interface SchemaBaseInfo {
   folder?: string
 }
 
-export const parametersSections = {
+export const parametersSections: { [key: string]: string } = {
   headers: 'header',
   params: 'path',
   querystring: 'query'
@@ -120,7 +120,7 @@ export class Spec implements SchemaBaseInfo {
     this.servers = []
     this.paths = {}
 
-    this.errors = Object.values(skipDefaultErrors ? {} : errors).reduce<Schema>((accu, e: Schema) => {
+    this.errors = Object.values(skipDefaultErrors ? {} : errors).reduce<Schema>((accu: Schema, e: Schema) => {
       accu[e.properties.statusCode.enum[0]] = omit(e, 'ref')
       return accu
     }, {})
@@ -178,13 +178,13 @@ export class Spec implements SchemaBaseInfo {
     }
   }
 
-  addModels(models: { [key: string]: Schema }) {
+  addModels(models: { [key: string]: Schema }): void {
     for (const [name, schema] of Object.entries(models)) {
       this.models[(schema.ref || name).split('/').pop()] = omit(schema, 'ref')
     }
   }
 
-  addSecuritySchemes(schemes: { [key: string]: SecurityScheme }) {
+  addSecuritySchemes(schemes: { [key: string]: SecurityScheme }): void {
     Object.assign(this.securitySchemes, schemes)
   }
 
@@ -193,13 +193,13 @@ export class Spec implements SchemaBaseInfo {
 
     // Filter only routes who have API schema defined and not hidden
     const apiRoutes = routes
-      .filter(r => {
+      .filter((r: Route) => {
         const schema = get(r, 'schema', {}) as { hide: boolean }
         const config = get(r, 'config', {}) as { hide: boolean }
 
         return !schema.hide && !config.hide
       })
-      .sort((a, b) => a.url.localeCompare(b.url))
+      .sort((a: Route, b: Route) => a.url.localeCompare(b.url))
 
     // For each route
     for (const route of apiRoutes) {
@@ -254,12 +254,14 @@ export class Spec implements SchemaBaseInfo {
     }
   }
 
-  private parseSecurity(securities: string | Array<string | object>): Array<Schema> {
+  private parseSecurity(securities: SecuritySchemeDefinition | Array<SecuritySchemeDefinition>): Array<Schema> {
     // Make sure it's an array
     if (!Array.isArray(securities)) securities = [securities]
 
     // Transform string to the regular format, the rest is leaved as it is
-    return securities.filter(s => s).map(s => (typeof s === 'string' ? { [s]: [] } : s))
+    return (securities as Array<SecuritySchemeDefinition>)
+      .filter((s: SecuritySchemeDefinition) => s)
+      .map((s: SecuritySchemeDefinition) => (typeof s === 'string' ? { [s]: [] } : s))
   }
 
   private parseParameters(schema: Schema): Schema {
@@ -347,7 +349,7 @@ export class Spec implements SchemaBaseInfo {
 
   private generateSchemaObjects(object: Schema, prefix: string): Schema {
     return Object.entries(object).reduce(
-      (accu, [k, v]) => {
+      (accu: Schema, [k, v]: [string, any]) => {
         accu[`${prefix}.${k}`] = omit(v, 'ref', '$ref')
         return accu
       },

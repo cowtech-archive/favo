@@ -48,9 +48,7 @@ export interface SchemaBaseInfo {
     folder?: string;
 }
 export declare const parametersSections: {
-    headers: string;
-    params: string;
-    querystring: string;
+    [key: string]: string;
 };
 export declare function omitFromSchema(schema: Schema, ...properties: Array<string>): Schema;
 export declare class Spec implements SchemaBaseInfo {

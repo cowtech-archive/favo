@@ -25,7 +25,7 @@ export function serializeErrorStack(error: Error): Array<string> {
   const cwd = process.cwd()
   if (!error.stack) return []
 
-  return error.stack.split('\n').map(s =>
+  return error.stack.split('\n').map((s: string) =>
     s
       .trim()
       .replace(/^at /, '')

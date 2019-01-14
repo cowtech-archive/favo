@@ -10,7 +10,7 @@ export const validationMessagesFormatters: { [key: string]: validationFormatter 
   minimum: (min: number) => `must be a number greater than or equal to ${min}`,
   maximum: (max: number) => `must be a number less than or equal to ${max}`,
   enum: (values: Array<string>) =>
-    `must be one of the following values: ${niceJoin(values.map(f => `"${f}"`), ' or ')}`,
+    `must be one of the following values: ${niceJoin(values.map((f: string) => `"${f}"`), ' or ')}`,
   invalidResponseCode: (code: number) => `This endpoint cannot respond with HTTP status ${code}.`,
   invalidResponse: (code: number) =>
     `The response returned from the endpoint violates its specification for the HTTP status ${code}.`
@@ -115,7 +115,7 @@ export function convertValidationErrors(
     }
 
     if (message) {
-      let property = Array.from(new Set([baseKey, key].filter(p => p)))
+      let property = Array.from(new Set([baseKey, key].filter((p: string) => p)))
         .join('.')
         .replace(/[\[\]]/g, '')
 

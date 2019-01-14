@@ -1,3 +1,7 @@
+### 2019-01-14 / 0.5.2
+
+* fix: Improve type definitions.
+
 ### 2018-11-26 / 0.5.1
 
 * fix: Autocompile security from securitySchemes.

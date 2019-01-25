@@ -1,6 +1,8 @@
+/// <reference types="node" />
 import { ValidationError } from 'ajv';
 import Boom from 'boom';
 import { Schema } from './spec';
+export declare type NodeError = NodeJS.ErrnoException;
 export declare type BoomError<T> = (message?: string, data?: T) => Boom<T>;
 export declare type GenericError = Error | ValidationError | Boom;
 export declare function isValidationError(error: GenericError): error is ValidationError;

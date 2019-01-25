@@ -4,9 +4,7 @@ import upperFirst from 'lodash.upperfirst'
 import { Schema } from './spec'
 import { convertValidationErrors, validationMessages } from './validation'
 
-interface ErrorWithCode extends Error {
-  code: string
-}
+export type NodeError = NodeJS.ErrnoException
 
 export type BoomError<T> = (message?: string, data?: T) => Boom<T>
 export type GenericError = Error | ValidationError | Boom
@@ -20,7 +18,7 @@ export function isBoomError(error: GenericError): error is Boom {
 }
 
 export function serializeErrorDescription(error: GenericError): string {
-  return `[${(error as ErrorWithCode).code || error.name}] ${error.message}`
+  return `[${(error as NodeError).code || error.name}] ${error.message}`
 }
 
 export function serializeErrorStack(error: Error): Array<string> {
@@ -37,7 +35,7 @@ export function serializeErrorStack(error: Error): Array<string> {
 
 export function toBoomError(error: GenericError, data?: Schema): Boom {
   const stack = serializeErrorStack(error)
-  const code = (error as ErrorWithCode).code
+  const code = (error as NodeError).code
   const message = error.message
   stack.shift()
 

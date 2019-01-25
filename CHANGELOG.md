@@ -1,3 +1,7 @@
+### 2019-01-25 / 0.6.0
+
+* feat: Simplified structures and error handling.
+
 ### 2019-01-14 / 0.5.2
 
 * fix: Improve type definitions.

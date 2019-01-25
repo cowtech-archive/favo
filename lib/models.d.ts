@@ -23,10 +23,5 @@ export interface Route<T extends ExpressMiddleware | RequestHandler = RequestHan
     };
     config?: any;
 }
-export declare type RawHandler = ((req: IncomingMessage, res: ServerResponse) => any | Promise<any>) & {
-    route?: Route;
-    routes?: Array<Route>;
-    corsEnabled?: boolean;
-};
 export declare const environment: string;
 export declare const globalState: GlobalState;

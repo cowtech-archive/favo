@@ -43,8 +43,8 @@
     "@types/lodash.omit": "^4.5.4",
     "@types/lodash.upperfirst": "^4.3.4",
     "@types/node": "^10.12.18",
-    "prettier": "^1.15.3",
+    "prettier": "^1.16.1",
     "ts-node": "^8.0.1",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.4"
   }
 }

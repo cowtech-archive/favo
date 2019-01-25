@@ -4,6 +4,10 @@ import get from 'lodash.get'
 import { Schema } from './spec'
 import { niceJoin } from './utils'
 
+export interface CustomValidationFormatters {
+  [key: string]: (raw: any) => boolean
+}
+
 export type validationFormatter = (...args: Array<any>) => string
 
 export const validationMessagesFormatters: { [key: string]: validationFormatter } = {
@@ -19,6 +23,7 @@ export const validationMessagesFormatters: { [key: string]: validationFormatter 
 export const validationMessages: { [key: string]: string } = {
   contentType: 'only JSON payloads are accepted. Please set the "Content-Type" header to be "application/json"',
   json: 'the body payload is not a valid JSON',
+  jsonEmpty: 'the JSON body payload cannot be empty if the "Content-Type" header is set',
   missing: 'must be present',
   unknown: 'is not a valid attribute',
   emptyObject: 'cannot be a empty object',

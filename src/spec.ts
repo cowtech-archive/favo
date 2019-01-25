@@ -1,36 +1,9 @@
 import { sync as glob } from 'glob'
-import * as http from 'http'
 import get from 'lodash.get'
 import omit from 'lodash.omit'
 import { SecurityScheme, SecuritySchemeDefinition } from './authentication'
 import { errors } from './errors'
-
-export type ExpressMiddleware = (
-  req: http.IncomingMessage,
-  res: http.ServerResponse,
-  next?: (err?: Error | boolean) => void
-) => void
-export type RequestHandler = (req: any, res: any) => void | Promise<any>
-
-export type HTTPMethod = 'DELETE' | 'GET' | 'HEAD' | 'PATCH' | 'POST' | 'PUT' | 'OPTIONS'
-
-export interface Route {
-  method?: HTTPMethod | Array<HTTPMethod>
-  url: string
-  path?: string
-  prefix?: string
-  schema?: {
-    body?: any
-    querystring?: any
-    params?: any
-    response?: {
-      [code: number]: any
-      [code: string]: any
-    }
-  }
-  config?: any
-  handler?: ExpressMiddleware | RequestHandler
-}
+import { Route } from './models'
 
 export type Schema = { [key: string]: any }
 
@@ -73,11 +46,7 @@ export function omitFromSchema(schema: Schema, ...properties: Array<string>): Sc
   }
 
   // Deep Clone the object
-  const newSchema = JSON.parse(JSON.stringify(schema))
-
-  for (const p of properties) {
-    delete newSchema.properties[p]
-  }
+  const newSchema = omit(JSON.parse(JSON.stringify(schema)), properties)
 
   // Remove from requird properties, if any
   if (newSchema.required) {
@@ -88,6 +57,7 @@ export function omitFromSchema(schema: Schema, ...properties: Array<string>): Sc
 }
 
 export class Spec implements SchemaBaseInfo {
+  // User provided
   title?: string
   description?: string
   authorName?: string
@@ -97,7 +67,7 @@ export class Spec implements SchemaBaseInfo {
   version?: string
   tags?: Array<Tag>
   servers: Array<Server>
-
+  // Internally set
   securitySchemes: Schema
   models: Schema
   parameters: Schema
@@ -180,7 +150,7 @@ export class Spec implements SchemaBaseInfo {
 
   addModels(models: { [key: string]: Schema }): void {
     for (const [name, schema] of Object.entries(models)) {
-      this.models[(schema.ref || name).split('/').pop()] = omit(schema, 'ref')
+      this.models[(schema.ref || name).replace(/^models[/.]/, '')] = omit(schema, 'ref')
     }
   }
 
@@ -207,7 +177,7 @@ export class Spec implements SchemaBaseInfo {
       const config = get(route, 'config', {})
 
       // OpenAPI groups by path and then method
-      const path = route.url.replace(/:([a-zA-Z]+)/g, '{$1}')
+      const path = route.url.replace(/:([a-zA-Z_]+)/g, '{$1}')
       if (!this.paths[path]) this.paths[path] = {}
 
       // Add the route to the spec
@@ -222,7 +192,7 @@ export class Spec implements SchemaBaseInfo {
         responses: this.parseResponses(schema.response || {})
       }
 
-      if (requestBody && method !== 'get' && method !== 'delete') {
+      if (requestBody && ['put', 'patch', 'post'].includes(method)) {
         this.paths[path][(route.method as string).toLowerCase()].requestBody = requestBody
       }
     }

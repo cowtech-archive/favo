@@ -1,6 +1,9 @@
 import Ajv from 'ajv';
 import Boom from 'boom';
 import { Schema } from './spec';
+export interface CustomValidationFormatters {
+    [key: string]: (raw: any) => boolean;
+}
 export declare type validationFormatter = (...args: Array<any>) => string;
 export declare const validationMessagesFormatters: {
     [key: string]: validationFormatter;

@@ -1,9 +1,3 @@
-import { IncomingMessage } from 'http'
-
-export interface BenchmarkedIncomingMessage extends IncomingMessage {
-  startTime: [number, number]
-}
-
 export function quoteRegexp(raw: string): string {
   return raw.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1')
 }

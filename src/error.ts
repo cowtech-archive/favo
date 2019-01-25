@@ -1,24 +1,26 @@
-import { ErrorObject } from 'ajv'
+import { ValidationError } from 'ajv'
 import Boom, { badRequest, internal } from 'boom'
-import capitalize from 'lodash.capitalize'
+import upperFirst from 'lodash.upperfirst'
 import { Schema } from './spec'
 import { convertValidationErrors, validationMessages } from './validation'
 
-export type BoomError<T> = (message?: string, data?: T) => Boom<T>
-
-export class ExtendedError extends Error {
+interface ErrorWithCode extends Error {
   code: string
-  validation?: Array<ErrorObject>
-
-  constructor(code: string, message?: string) {
-    super(message)
-
-    this.code = code
-  }
 }
 
-export function serializeErrorDescription(error: ExtendedError): string {
-  return `[${error.code || error.name}] ${error.message}`
+export type BoomError<T> = (message?: string, data?: T) => Boom<T>
+export type GenericError = Error | ValidationError | Boom
+
+export function isValidationError(error: GenericError): error is ValidationError {
+  return (error as ValidationError).validation
+}
+
+export function isBoomError(error: GenericError): error is Boom {
+  return (error as Boom).isBoom
+}
+
+export function serializeErrorDescription(error: GenericError): string {
+  return `[${(error as ErrorWithCode).code || error.name}] ${error.message}`
 }
 
 export function serializeErrorStack(error: Error): Array<string> {
@@ -33,18 +35,25 @@ export function serializeErrorStack(error: Error): Array<string> {
   )
 }
 
-export function convertError(data: Schema, e: ExtendedError): Boom {
-  const stack = serializeErrorStack(e)
+export function toBoomError(error: GenericError, data?: Schema): Boom {
+  const stack = serializeErrorStack(error)
+  const code = (error as ErrorWithCode).code
+  const message = error.message
   stack.shift()
 
-  if (e.validation) {
-    const prefix = e.message.split(/[\.\s\[]/).shift()
-    return convertValidationErrors(data, e.validation, prefix!)
-  } else if (e.code === 'INVALID_CONTENT_TYPE') return badRequest(capitalize(validationMessages.contentType))
-  else if (e.code === 'MALFORMED_JSON' || e.message === 'Invalid JSON' || (stack[0] || '').startsWith('JSON.parse')) {
-    return badRequest(capitalize(validationMessages.json))
+  if (isBoomError(error)) {
+    return error
+  } else if (isValidationError(error)) {
+    const prefix = message.split(/[\.\s\[]/).shift()
+    return convertValidationErrors(data!, error.errors || error.validation, prefix!)
+  } else if (code === 'INVALID_CONTENT_TYPE' || code === 'FST_ERR_CTP_INVALID_MEDIA_TYPE') {
+    return badRequest(upperFirst(validationMessages.contentType))
+  } else if (code === 'FST_ERR_CTP_EMPTY_JSON_BODY') {
+    return badRequest(upperFirst(validationMessages.jsonEmpty))
+  } else if (code === 'MALFORMED_JSON' || message === 'Invalid JSON' || (stack[0] || '').startsWith('JSON.parse')) {
+    return badRequest(upperFirst(validationMessages.json))
   }
 
   // Message must be passed as data otherwise Boom will hide it
-  return internal('', { message: serializeErrorDescription(e), stack })
+  return internal('', { message: serializeErrorDescription(error), stack })
 }

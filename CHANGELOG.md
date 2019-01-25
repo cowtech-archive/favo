@@ -1,3 +1,7 @@
+### 2019-01-25 / 0.6.2
+
+* chore: Make sure only npm is used.
+
 ### 2019-01-25 / 0.6.1
 
 * fix: Build fix.

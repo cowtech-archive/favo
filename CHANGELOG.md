@@ -1,3 +1,7 @@
+### 2019-01-25 / 0.6.1
+
+* fix: Build fix.
+
 ### 2019-01-25 / 0.6.0
 
 * feat: Simplified structures and error handling.

@@ -1,3 +1,8 @@
+### 2019-01-27 / 0.8.0
+
+* feat: Added lodash.set to dependencies.
+* feat: Added lodash.set to dependencies.
+
 ### 2019-01-25 / 0.7.0
 
 * feat: Export Node error.

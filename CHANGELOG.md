@@ -1,3 +1,7 @@
+### 2019-02-24 / 0.8.1
+
+* chore: Updated dependencies.
+
 ### 2019-01-27 / 0.8.0
 
 * feat: Added lodash.set to dependencies.

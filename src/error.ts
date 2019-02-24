@@ -23,7 +23,9 @@ export function serializeErrorDescription(error: GenericError): string {
 
 export function serializeErrorStack(error: Error): Array<string> {
   const cwd = process.cwd()
-  if (!error.stack) return []
+  if (!error.stack) {
+    return []
+  }
 
   return error.stack.split('\n').map((s: string) =>
     s

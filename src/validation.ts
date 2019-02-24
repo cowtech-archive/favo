@@ -109,8 +109,11 @@ export function convertValidationErrors(
         let reason = (e.params as Ajv.FormatParams).format
 
         // Normalize the key
-        if (reason === 'ipv4' || reason === 'ipv6') reason = 'ip'
-        else if (reason === 'date-time') reason = 'timestamp'
+        if (reason === 'ipv4' || reason === 'ipv6') {
+          reason = 'ip'
+        } else if (reason === 'date-time') {
+          reason = 'timestamp'
+        }
 
         message = validationMessagesFormatters[reason]
           ? validationMessagesFormatters[reason](reason)
@@ -124,7 +127,9 @@ export function convertValidationErrors(
         .join('.')
         .replace(/[\[\]]/g, '')
 
-      if (stripPrefix) property = property.replace(stripPrefix, '')
+      if (stripPrefix) {
+        property = property.replace(stripPrefix, '')
+      }
 
       errors[property] = message
     }

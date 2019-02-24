@@ -79,7 +79,9 @@ export class Spec implements SchemaBaseInfo {
     { title, description, authorName, authorUrl, authorEmail, license, version, servers, tags, folder }: SchemaBaseInfo,
     skipDefaultErrors: boolean = false
   ) {
-    if (!license) license = 'MIT'
+    if (!license) {
+      license = 'MIT'
+    }
 
     Object.assign(this, { title, description, authorName, authorUrl, authorEmail, license, version, servers, tags })
 
@@ -95,7 +97,9 @@ export class Spec implements SchemaBaseInfo {
       return accu
     }, {})
 
-    if (folder) this.addFolder(folder)
+    if (folder) {
+      this.addFolder(folder)
+    }
   }
 
   generate(): Schema {
@@ -159,7 +163,9 @@ export class Spec implements SchemaBaseInfo {
   }
 
   addRoutes(routes: Route | Array<Route>): void {
-    if (!Array.isArray(routes)) routes = [routes]
+    if (!Array.isArray(routes)) {
+      routes = [routes]
+    }
 
     // Filter only routes who have API schema defined and not hidden
     const apiRoutes = routes
@@ -178,7 +184,9 @@ export class Spec implements SchemaBaseInfo {
 
       // OpenAPI groups by path and then method
       const path = route.url.replace(/:([a-zA-Z_]+)/g, '{$1}')
-      if (!this.paths[path]) this.paths[path] = {}
+      if (!this.paths[path]) {
+        this.paths[path] = {}
+      }
 
       // Add the route to the spec
       const method = (route.method as string).toLowerCase()
@@ -208,12 +216,19 @@ export class Spec implements SchemaBaseInfo {
           const models = get(route, 'config.models')
           const securitySchemes = get(route, 'config.securitySchemes')
 
-          if (models) this.addModels(models)
+          if (models) {
+            this.addModels(models)
+          }
           if (securitySchemes) {
-            if (!route.config.security) route.config.security = []
-            else if (typeof route.config.security === 'string') route.config.security = [route.config.security]
+            if (!route.config.security) {
+              route.config.security = []
+            } else if (typeof route.config.security === 'string') {
+              route.config.security = [route.config.security]
+            }
 
-            for (const scheme of Object.keys(securitySchemes)) route.config.security.push(scheme)
+            for (const scheme of Object.keys(securitySchemes)) {
+              route.config.security.push(scheme)
+            }
 
             this.addSecuritySchemes(securitySchemes)
           }
@@ -226,7 +241,9 @@ export class Spec implements SchemaBaseInfo {
 
   private parseSecurity(securities: SecuritySchemeDefinition | Array<SecuritySchemeDefinition>): Array<Schema> {
     // Make sure it's an array
-    if (!Array.isArray(securities)) securities = [securities]
+    if (!Array.isArray(securities)) {
+      securities = [securities]
+    }
 
     // Transform string to the regular format, the rest is leaved as it is
     return (securities as Array<SecuritySchemeDefinition>)
@@ -309,7 +326,9 @@ export class Spec implements SchemaBaseInfo {
   private resolveReference(schema: Schema, ...keysBlacklist: Array<string>): Schema {
     if (schema.$ref || schema.ref) {
       let ref = schema.$ref || schema.ref
-      if (ref.indexOf('#/') === -1) ref = `#/components/schemas/${ref.replace(/\//g, '.')}`
+      if (ref.indexOf('#/') === -1) {
+        ref = `#/components/schemas/${ref.replace(/\//g, '.')}`
+      }
 
       return { $ref: ref }
     }

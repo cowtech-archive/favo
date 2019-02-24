@@ -1,3 +1,7 @@
+### 2019-02-24 / 0.8.2
+
+* chore: Lint fix.
+
 ### 2019-02-24 / 0.8.1
 
 * chore: Updated dependencies.

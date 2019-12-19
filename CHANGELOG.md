@@ -1,3 +1,7 @@
+### 2019-12-19 / 0.8.5
+
+- chore: Rebuild.
+
 ### 2019-12-19 / 0.8.4
 
 - fix: Fixed error definitions.

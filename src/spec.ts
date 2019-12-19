@@ -46,7 +46,7 @@ export function omitFromSchema(schema: Schema, ...properties: Array<string>): Sc
   }
 
   // Deep Clone the object
-  const newSchema = omit(JSON.parse(JSON.stringify(schema)), properties)
+  const newSchema: Schema = omit(JSON.parse(JSON.stringify(schema)), properties)
 
   // Remove from requird properties, if any
   if (newSchema.required) {
@@ -179,7 +179,7 @@ export class Spec implements SchemaBaseInfo {
 
     // For each route
     for (const route of apiRoutes) {
-      const schema: Schema = get(route, 'schema', {})!
+      const schema: Schema = get(route, 'schema', {})
       const config = get(route, 'config', {})
 
       // OpenAPI groups by path and then method
@@ -337,12 +337,9 @@ export class Spec implements SchemaBaseInfo {
   }
 
   private generateSchemaObjects(object: Schema, prefix: string): Schema {
-    return Object.entries(object).reduce(
-      (accu: Schema, [k, v]: [string, any]) => {
-        accu[`${prefix}.${k}`] = omit(v, 'ref', '$ref')
-        return accu
-      },
-      {} as Schema
-    )
+    return Object.entries(object).reduce((accu: Schema, [k, v]: [string, any]) => {
+      accu[`${prefix}.${k}`] = omit(v, 'ref', '$ref')
+      return accu
+    }, {} as Schema)
   }
 }

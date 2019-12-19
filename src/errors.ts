@@ -5,17 +5,15 @@ import {
   FORBIDDEN,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
-  UNAUTHORIZED,
-  UNPROCESSABLE_ENTITY
+  UNAUTHORIZED
 } from 'http-status-codes'
 import { Schema } from './spec'
-import { validationMessages } from './validation'
 
 export const errors: { [key: string]: Schema } = {
   badRequest: {
     type: 'object',
     ref: `errors/${BAD_REQUEST}`,
-    description: 'Error returned when the client payload is either invalid or malformed.',
+    description: 'Error returned when the client payload is either invalid, malformed or has logical errors.',
     properties: {
       statusCode: { type: 'number', description: 'The error code', enum: [BAD_REQUEST], example: BAD_REQUEST },
       error: { type: 'string', description: 'The error title', enum: ['Bad Request'], example: 'Bad Request' },
@@ -23,7 +21,11 @@ export const errors: { [key: string]: Schema } = {
         type: 'string',
         description: 'The error message',
         pattern: '.+',
-        example: validationMessages.contentType
+        example: 'Bad input data.'
+      },
+      errors: {
+        type: 'object',
+        additionalProperties: true
       }
     },
     required: ['statusCode', 'error', 'message'],
@@ -75,32 +77,6 @@ export const errors: { [key: string]: Schema } = {
       message: { type: 'string', description: 'The error message', pattern: '.+', example: 'Conflict.' }
     },
     required: ['statusCode', 'error', 'message'],
-    additionalProperties: false
-  },
-  unprocessableEntity: {
-    type: 'object',
-    ref: `errors/${UNPROCESSABLE_ENTITY}`,
-    description: 'Error returned when the client payload is well formed but it also has some logical errors.',
-    properties: {
-      statusCode: {
-        type: 'number',
-        description: 'The error code',
-        enum: [UNPROCESSABLE_ENTITY],
-        example: UNPROCESSABLE_ENTITY
-      },
-      error: {
-        type: 'string',
-        description: 'The error title',
-        enum: ['Unprocessable Entity'],
-        example: 'Unprocessable Entity'
-      },
-      message: { type: 'string', description: 'The error message', pattern: '.+', example: 'Bad input data.' },
-      errors: {
-        type: 'object',
-        additionalProperties: true
-      }
-    },
-    required: ['statusCode', 'error', 'message', 'errors'],
     additionalProperties: false
   },
   internalServerError: {

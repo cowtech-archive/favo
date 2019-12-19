@@ -26,6 +26,10 @@ export const errors: { [key: string]: Schema } = {
       errors: {
         type: 'object',
         additionalProperties: true
+      },
+      failedValidations: {
+        type: 'object',
+        additionalProperties: true
       }
     },
     required: ['statusCode', 'error', 'message'],
@@ -104,7 +108,7 @@ export const errors: { [key: string]: Schema } = {
       }
     },
     required: ['statusCode', 'error', 'message'],
-    additionalProperties: false
+    additionalProperties: true
   },
   gatewayError: {
     type: 'object',

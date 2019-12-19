@@ -1,3 +1,7 @@
+### 2019-12-19 / 0.8.3
+
+- chore: Pre-deprecation cleanup.
+
 ### 2019-02-24 / 0.8.2
 
 * chore: Lint fix.

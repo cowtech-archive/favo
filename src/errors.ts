@@ -1,135 +1,84 @@
+import { STATUS_CODES } from 'http'
 import {
   BAD_GATEWAY,
   BAD_REQUEST,
   CONFLICT,
   FORBIDDEN,
+  GATEWAY_TIMEOUT,
   INTERNAL_SERVER_ERROR,
+  METHOD_NOT_ALLOWED,
+  NOT_ACCEPTABLE,
   NOT_FOUND,
-  UNAUTHORIZED
+  UNAUTHORIZED,
+  UNSUPPORTED_MEDIA_TYPE
 } from 'http-status-codes'
 import { Schema } from './spec'
 
-export const errors: { [key: string]: Schema } = {
-  badRequest: {
+function buildError(
+  statusCode: number,
+  description: string,
+  properties: { [key: string]: Schema } = {},
+  required: Array<string> = [],
+  additionalProperties: boolean = false
+): Schema {
+  const error = STATUS_CODES[statusCode]!
+
+  return {
     type: 'object',
-    ref: `errors/${BAD_REQUEST}`,
-    description: 'Error returned when the client payload is either invalid, malformed or has logical errors.',
+    ref: `errors/${statusCode}`,
+    description,
     properties: {
-      statusCode: { type: 'number', description: 'The error code', enum: [BAD_REQUEST], example: BAD_REQUEST },
-      error: { type: 'string', description: 'The error title', enum: ['Bad Request'], example: 'Bad Request' },
+      statusCode: { type: 'number', description: 'The error code', enum: [statusCode], example: statusCode },
+      error: { type: 'string', description: 'The error title', enum: [error], example: error },
       message: {
         type: 'string',
         description: 'The error message',
         pattern: '.+',
-        example: 'Bad input data.'
+        example: `${error}.`
       },
-      errors: {
-        type: 'object',
-        additionalProperties: true
-      },
-      failedValidations: {
-        type: 'object',
-        additionalProperties: true
-      }
-    },
-    required: ['statusCode', 'error', 'message'],
-    additionalProperties: false
-  },
-  unauthorized: {
-    type: 'object',
-    ref: `errors/${UNAUTHORIZED}`,
-    description: 'Error returned when then user does not provide any authorization grant.',
-    properties: {
-      statusCode: { type: 'number', description: 'The error code', enum: [UNAUTHORIZED], example: UNAUTHORIZED },
-      error: { type: 'string', description: 'The error title', enum: ['Unauthorized'], example: 'Unauthorized' },
-      message: { type: 'string', description: 'The error message', pattern: '.+', example: 'Unauthorized.' }
-    },
-    required: ['statusCode', 'error', 'message'],
-    additionalProperties: false
-  },
-  forbidden: {
-    type: 'object',
-    ref: `errors/${FORBIDDEN}`,
-    description: 'Error returned when then user is not authorized to access requested resource or resources.',
-    properties: {
-      statusCode: { type: 'number', description: 'The error code', enum: [FORBIDDEN], example: FORBIDDEN },
-      error: { type: 'string', description: 'The error title', enum: ['Forbidden'], example: 'Forbidden' },
-      message: { type: 'string', description: 'The error message', pattern: '.+', example: 'Forbidden.' }
-    },
-    required: ['statusCode', 'error', 'message'],
-    additionalProperties: false
-  },
-  notFound: {
-    type: 'object',
-    ref: `errors/${NOT_FOUND}`,
-    description: 'Error returned when then requested resource or resources are not found.',
-    properties: {
-      statusCode: { type: 'number', description: 'The error code', enum: [NOT_FOUND], example: NOT_FOUND },
-      error: { type: 'string', description: 'The error title', enum: ['Not Found'], example: 'Not Found' },
-      message: { type: 'string', description: 'The error message', pattern: '.+', example: 'Not found.' }
-    },
-    required: ['statusCode', 'error', 'message'],
-    additionalProperties: false
-  },
-  conflict: {
-    type: 'object',
-    ref: `errors/${CONFLICT}`,
-    description: 'Error returned when then requested resource already existss.',
-    properties: {
-      statusCode: { type: 'number', description: 'The error code', enum: [CONFLICT], example: CONFLICT },
-      error: { type: 'string', description: 'The error title', enum: ['Conflict'], example: 'Conflict' },
-      message: { type: 'string', description: 'The error message', pattern: '.+', example: 'Conflict.' }
-    },
-    required: ['statusCode', 'error', 'message'],
-    additionalProperties: false
-  },
-  internalServerError: {
-    type: 'object',
-    ref: `errors/${INTERNAL_SERVER_ERROR}`,
-    description: 'Error returned when a unexpected error was thrown by the server.',
-    properties: {
-      statusCode: {
-        type: 'number',
-        description: 'The error code',
-        enum: [INTERNAL_SERVER_ERROR],
-        example: INTERNAL_SERVER_ERROR
-      },
-      error: {
+      code: {
         type: 'string',
-        description: 'The error title',
-        enum: ['Internal Server Error'],
-        example: 'Internal Server Error'
+        description: 'The error internal code',
+        pattern: '.+',
+        example: error.toUpperCase().replace(/\s+/g, '_')
       },
-      message: { type: 'string', description: 'The error message', pattern: '.+', example: 'Server error.' },
-      stack: { type: 'array', items: { type: 'string' } },
-      errors: {
-        type: 'object',
-        additionalProperties: true
-      }
+      ...properties
     },
-    required: ['statusCode', 'error', 'message'],
-    additionalProperties: true
-  },
-  gatewayError: {
-    type: 'object',
-    ref: `errors/${BAD_GATEWAY}`,
-    description: 'Error returned when a unexpected error was thrown by a upstream server.',
-    properties: {
-      statusCode: {
-        type: 'number',
-        description: 'The error code',
-        enum: [BAD_GATEWAY],
-        example: BAD_GATEWAY
-      },
-      error: {
-        type: 'string',
-        description: 'The error title',
-        enum: ['Bad Gateway'],
-        example: 'Bad Gateway'
-      },
-      message: { type: 'string', description: 'The error message', pattern: '.+', example: 'Upstream error.' }
-    },
-    required: ['statusCode', 'error', 'message'],
-    additionalProperties: false
+    required: ['statusCode', 'error', 'message', ...required],
+    additionalProperties
   }
+}
+
+export const errors: { [key: string]: Schema } = {
+  badRequest: buildError(
+    BAD_REQUEST,
+    'Error returned when the client payload is either invalid, malformed or has logical validation errors.',
+    {
+      errors: { type: 'object', additionalProperties: true },
+      failedValidations: { type: 'object', additionalProperties: true }
+    }
+  ),
+  unauthorized: buildError(UNAUTHORIZED, 'Error returned when client does not provide any valid authorization.'),
+  forbidden: buildError(FORBIDDEN, 'Error returned when client is not authorized to access the requested resource.'),
+  notFound: buildError(NOT_FOUND, 'Error returned when the requested resource is not found.'),
+  methodNotAllowed: buildError(
+    METHOD_NOT_ALLOWED,
+    'Error returned when the requested method resource is not available.'
+  ),
+  notAcceptable: buildError(NOT_ACCEPTABLE, 'Error returned when the server is not able to accept the request.'),
+  conflict: buildError(CONFLICT, 'Error returned when the requested resource already existss.'),
+  unsupportedType: buildError(
+    UNSUPPORTED_MEDIA_TYPE,
+    'Error returned when the server is not able to accept the request media type.'
+  ),
+  internalServerError: buildError(
+    INTERNAL_SERVER_ERROR,
+    'Error returned when a unexpected error was thrown by the server.',
+    {
+      stack: { type: 'array', items: { type: 'string', pattern: '.+' } },
+      errors: { type: 'object', additionalProperties: true }
+    }
+  ),
+  gatewayError: buildError(BAD_GATEWAY, 'Error returned when a unexpected error was thrown by a upstream server.'),
+  gatewayTimeout: buildError(GATEWAY_TIMEOUT, 'Error returned when a upstream server timed out.')
 }

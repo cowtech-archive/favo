@@ -1,3 +1,7 @@
+### 2019-12-21 / 0.9.0
+
+- feat: Improved errors.
+
 ### 2019-12-19 / 0.8.5
 
 - chore: Rebuild.

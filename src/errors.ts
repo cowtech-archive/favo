@@ -76,7 +76,8 @@ export const errors: { [key: string]: Schema } = {
     'Error returned when a unexpected error was thrown by the server.',
     {
       stack: { type: 'array', items: { type: 'string', pattern: '.+' } },
-      errors: { type: 'object', additionalProperties: true }
+      errors: { type: 'object', additionalProperties: true },
+      failedValidations: { type: 'object', additionalProperties: true }
     }
   ),
   gatewayError: buildError(BAD_GATEWAY, 'Error returned when a unexpected error was thrown by a upstream server.'),

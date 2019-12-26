@@ -1,3 +1,7 @@
+### 2019-12-26 / 0.10.1
+
+- feat: Add failed validations to internalServerError.
+
 ### 2019-12-26 / 0.10.0
 
 

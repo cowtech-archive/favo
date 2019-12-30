@@ -1,3 +1,7 @@
+### 2019-12-30 / 0.12.0
+
+- chore: Updated TS settings.
+
 ### 2019-12-30 / 0.11.1
 
 - fix: Fixed routes sorting.

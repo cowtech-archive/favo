@@ -184,7 +184,9 @@ export class Spec implements SchemaBaseInfo {
 
         return !schema.hide && !config.hide
       })
-      .sort((a: Route, b: Route) => a.url.localeCompare(b.url))
+      .sort((a: Route, b: Route) =>
+        a.url !== b.url ? a.url.localeCompare(b.url) : (a.method as string).localeCompare(b.method as string)
+      )
 
     // For each route
     for (const route of apiRoutes) {

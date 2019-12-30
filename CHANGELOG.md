@@ -1,3 +1,7 @@
+### 2019-12-30 / 0.11.1
+
+- fix: Fixed routes sorting.
+
 ### 2019-12-30 / 0.11.0
 
 - feat: Simplified code.

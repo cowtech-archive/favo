@@ -2,7 +2,6 @@ import { sync as glob } from 'glob'
 import { SecurityScheme, SecuritySchemeDefinition } from './authentication'
 import { errors } from './errors'
 import { Route } from './models'
-import { get, omit } from './utils'
 
 export type Schema = { [key: string]: any }
 
@@ -39,13 +38,24 @@ export const parametersSections: { [key: string]: string } = {
   querystring: 'query'
 }
 
+function omit(source: object, ...properties: Array<string>): object {
+  // Deep clone the object
+  const target = JSON.parse(JSON.stringify(source))
+
+  for (const property of properties) {
+    delete target[property]
+  }
+
+  return target
+}
+
 export function omitFromSchema(schema: Schema, ...properties: Array<string>): Schema {
   if (schema.type !== 'object') {
     return schema
   }
 
   // Deep Clone the object
-  const newSchema: Schema = omit(JSON.parse(JSON.stringify(schema)), properties)
+  const newSchema: Schema = omit(JSON.parse(JSON.stringify(schema)), ...properties)
 
   // Remove from requird properties, if any
   if (newSchema.required) {
@@ -169,8 +179,8 @@ export class Spec implements SchemaBaseInfo {
     // Filter only routes who have API schema defined and not hidden
     const apiRoutes = routes
       .filter((r: Route) => {
-        const schema = get(r, 'schema', {}) as { hide: boolean }
-        const config = get(r, 'config', {}) as { hide: boolean }
+        const schema = (r.schema ?? {}) as Schema
+        const config = (r.config ?? {}) as Schema
 
         return !schema.hide && !config.hide
       })
@@ -178,8 +188,8 @@ export class Spec implements SchemaBaseInfo {
 
     // For each route
     for (const route of apiRoutes) {
-      const schema = get<Schema>(route, 'schema', {})!
-      const config = get<Schema>(route, 'config', {})!
+      const schema = (route.schema ?? {}) as Schema
+      const config = (route.config ?? {}) as Schema
 
       // OpenAPI groups by path and then method
       const path = route.url.replace(/:([a-zA-Z_]+)/g, '{$1}')
@@ -212,8 +222,8 @@ export class Spec implements SchemaBaseInfo {
 
       for (const route of routes) {
         if (route) {
-          const models = get<{ [key: string]: Schema }>(route, 'config.models')
-          const securitySchemes = get<{ [key: string]: SecurityScheme }>(route, 'config.securitySchemes')
+          const models = route?.config?.models as { [key: string]: Schema }
+          const securitySchemes = route?.config?.securitySchemes as { [key: string]: SecurityScheme }
 
           if (models) {
             this.addModels(models)
@@ -263,14 +273,14 @@ export class Spec implements SchemaBaseInfo {
       }
 
       // Get the list of required parameters
-      const required = get<Array<string>>(specs, 'required', [])!
+      const required: Array<string> = specs.required ?? []
 
       // For each property
-      for (const [name, spec] of Object.entries(get<{ [key: string]: Schema }>(specs, 'properties', {})!)) {
+      for (const [name, spec] of Object.entries((specs.properties ?? {}) as { [key: string]: Schema })) {
         params.push({
           name,
           in: where,
-          description: spec.description || null,
+          description: specs.description,
           required: required.includes(name),
           schema: this.resolveReference(spec, 'description', 'components')
         })
@@ -332,12 +342,12 @@ export class Spec implements SchemaBaseInfo {
       return { $ref: ref }
     }
 
-    return omit(schema, ['ref', '$ref'].concat(keysBlacklist))
+    return omit(schema, ...['ref', '$ref'].concat(keysBlacklist))
   }
 
   private generateSchemaObjects(object: Schema, prefix: string): Schema {
     return Object.entries(object).reduce((accu: Schema, [k, v]: [string, any]) => {
-      accu[`${prefix}.${k}`] = omit(v, ['ref', '$ref'])
+      accu[`${prefix}.${k}`] = omit(v, 'ref', '$ref')
       return accu
     }, {} as Schema)
   }

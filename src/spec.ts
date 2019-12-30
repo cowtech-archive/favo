@@ -1,9 +1,8 @@
 import { sync as glob } from 'glob'
-import get from 'lodash.get'
-import omit from 'lodash.omit'
 import { SecurityScheme, SecuritySchemeDefinition } from './authentication'
 import { errors } from './errors'
 import { Route } from './models'
+import { get, omit } from './utils'
 
 export type Schema = { [key: string]: any }
 
@@ -179,8 +178,8 @@ export class Spec implements SchemaBaseInfo {
 
     // For each route
     for (const route of apiRoutes) {
-      const schema: Schema = get(route, 'schema', {})
-      const config = get(route, 'config', {})
+      const schema = get<Schema>(route, 'schema', {})!
+      const config = get<Schema>(route, 'config', {})!
 
       // OpenAPI groups by path and then method
       const path = route.url.replace(/:([a-zA-Z_]+)/g, '{$1}')
@@ -213,8 +212,8 @@ export class Spec implements SchemaBaseInfo {
 
       for (const route of routes) {
         if (route) {
-          const models = get(route, 'config.models')
-          const securitySchemes = get(route, 'config.securitySchemes')
+          const models = get<{ [key: string]: Schema }>(route, 'config.models')
+          const securitySchemes = get<{ [key: string]: SecurityScheme }>(route, 'config.securitySchemes')
 
           if (models) {
             this.addModels(models)
@@ -264,10 +263,10 @@ export class Spec implements SchemaBaseInfo {
       }
 
       // Get the list of required parameters
-      const required = get(specs, 'required', [])
+      const required = get<Array<string>>(specs, 'required', [])!
 
       // For each property
-      for (const [name, spec] of Object.entries(get<{ [key: string]: Schema }>(specs, 'properties', {}))) {
+      for (const [name, spec] of Object.entries(get<{ [key: string]: Schema }>(specs, 'properties', {})!)) {
         params.push({
           name,
           in: where,
@@ -338,7 +337,7 @@ export class Spec implements SchemaBaseInfo {
 
   private generateSchemaObjects(object: Schema, prefix: string): Schema {
     return Object.entries(object).reduce((accu: Schema, [k, v]: [string, any]) => {
-      accu[`${prefix}.${k}`] = omit(v, 'ref', '$ref')
+      accu[`${prefix}.${k}`] = omit(v, ['ref', '$ref'])
       return accu
     }, {} as Schema)
   }

@@ -31,19 +31,11 @@
   "dependencies": {
     "ajv": "^6.10.2",
     "glob": "^7.1.6",
-    "http-status-codes": "^1.4.0",
-    "lodash.get": "^4.4.2",
-    "lodash.omit": "^4.5.0",
-    "lodash.set": "^4.3.2",
-    "lodash.upperfirst": "^4.3.1"
+    "http-status-codes": "^1.4.0"
   },
   "devDependencies": {
     "@cowtech/tslint-config": "^5.13.0",
     "@types/glob": "^7.1.1",
-    "@types/lodash.get": "^4.4.6",
-    "@types/lodash.omit": "^4.5.6",
-    "@types/lodash.set": "^4.3.6",
-    "@types/lodash.upperfirst": "^4.3.6",
     "@types/node": "^12.12.21",
     "prettier": "^1.19.1",
     "ts-node": "^8.5.4",

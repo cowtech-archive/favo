@@ -1,5 +1,7 @@
 # @cowtech/favo
 
+## END OF DEVELOPMENT NOTICE - This package has been discontinued
+
 [![Package Version](https://img.shields.io/npm/v/@cowtech/favo.svg)](https://npmjs.com/package/@cowtech/favo)
 [![Dependency Status](https://img.shields.io/gemnasium/github.com/cowtech/favo.svg)](https://gemnasium.com/github.com/cowtech/favo)
 
